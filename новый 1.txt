@@ -1,0 +1,115 @@
+using System;
+using System.IO;
+using System.Reflection.Metadata;
+struct Book
+{
+    public string title;
+    public int year;
+    public int pageCount;
+    public string content;
+    public string authorName;
+    public int authorBirthYear;
+    public string authorBirthPlace;
+}
+class Program
+{
+    static void Main()
+    {
+        string filePath = "books.bin";
+        while (true)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Составьте программу на языке С#, позволяющую пользователю с помощью меню:\r\n – заполнить и сохранить в двоичном файле данные, определенные структурой с полями,\r\ncтруктура содержит сведения о книгах: название книги, год издания, количество\r\nстраниц, краткое содержание, имя автора, год рождения, место рождения. Критерий просмотра – имя автора;\r\n – считать из файла и просмотреть на экране необходимые сведения в соответствии с введенным\r\nпользователем критерием;\r\n – выйти из программы.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Меню:");
+            Console.WriteLine("1. Заполнить и сохранить данные");
+            Console.WriteLine("2. Считать и просмотреть данные");
+            Console.WriteLine("3. Выйти из программы");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("Выберите действие:");
+            int choice = Convert.ToInt32(Console.ReadLine());
+            switch (choice)
+            {
+                case 1:
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("1. Заполнить и сохранить данные");
+                    Console.WriteLine("Введите данные о книге:");
+                    Book book;
+                    Console.Write("Название книги: ");
+                    book.title = Console.ReadLine();
+                    Console.Write("Год издания: ");
+                    book.year = Convert.ToInt32(Console.ReadLine());
+                    Console.Write("Количество страниц: ");
+                    book.pageCount = Convert.ToInt32(Console.ReadLine());
+                    Console.Write("Краткое содержание: ");
+                    book.content = Console.ReadLine();
+                    Console.Write("Имя автора: ");
+                    book.authorName = Console.ReadLine();
+                    Console.Write("Год рождения автора: ");
+                    book.authorBirthYear = Convert.ToInt32(Console.ReadLine());
+                    Console.Write("Место рождения автора: ");
+                    book.authorBirthPlace = Console.ReadLine();
+                  using (BinaryWriter writer = new BinaryWriter(File.Open(filePath, FileMode.Append)))//запись данных в двоичном формате
+                    {
+                        writer.Write(book.title);
+                        writer.Write(book.year);
+                        writer.Write(book.pageCount);
+                        writer.Write(book.content);
+                        writer.Write(book.authorName);
+                        writer.Write(book.authorBirthYear);
+                        writer.Write(book.authorBirthPlace);
+                    }
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Данные успешно сохранены.");
+                    Console.ReadKey();
+                    break;
+                case 2:
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("2. Считать и просмотреть данные");
+                    Console.Write("Введите имя автора для поиска: ");
+                    string authorName = Console.ReadLine();
+                    bool authorFound = false; // отслеживания автора
+                    using (BinaryReader reader = new BinaryReader(File.Open(filePath, FileMode.OpenOrCreate))) // считывание данных 
+                    {
+                        while (reader.PeekChar() > -1)
+                        {
+                            string title = reader.ReadString();
+                            int year = reader.ReadInt32();
+                            int pageCount = reader.ReadInt32();
+                            string content = reader.ReadString();
+                            string author = reader.ReadString();
+                            int authorBirthYear = reader.ReadInt32();
+                            string authorBirthPlace = reader.ReadString();
+                            if (author == authorName) //если имя автора есть в файле
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.WriteLine("Книга: " + title);
+                                Console.WriteLine("Год издания: " + year);
+                                Console.WriteLine("Количество страниц: " + pageCount);
+                                Console.WriteLine("Краткое содержание: " + content);
+                                Console.WriteLine("Имя автора: " + author);
+                                Console.WriteLine("Год рождения автора: " + authorBirthYear);
+                                Console.WriteLine("Место рождения автора: " + authorBirthPlace);
+                                Console.WriteLine();
+                                authorFound = true;
+                            }
+                        }
+                    }
+                    if (!authorFound) // если автор не найден
+                    {
+                        Console.WriteLine("Информация о данном авторе не найдена.");
+                    }
+                    Console.ReadKey();
+                    break;
+                case 3:
+                    return;
+                default:
+                    Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                    break;
+            }
+        }
+    }
+} 
